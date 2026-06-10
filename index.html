@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="description" content="Pulse.tv — Premium live TV streaming with 500+ channels. YouTube-style experience." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Pulse.tv — Live TV Streaming</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body class="theme-dark">
+
+  <!-- Error Boundary -->
+  <div id="error-boundary" class="error-boundary" style="display:none;">
+    <div class="error-boundary-inner">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>Something went wrong.</span>
+      <button onclick="location.reload()">Reload App</button>
+    </div>
+  </div>
+
+  <!-- Network Banner -->
+  <div id="network-banner" class="network-banner" style="display:none;">
+    <div class="network-banner-inner">
+      <i class="fa-solid fa-wifi-slash"></i>
+      <span>No internet connection</span>
+      <button onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="top-header">
+    <div class="header-left">
+      <button class="icon-btn sidebar-toggle-btn" id="sidebar-toggle-btn" onclick="PulseApp.toggleSidebar('left')" title="Toggle Navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="logo-area">
+        <svg class="brand-icon" width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="var(--accent-color, #6c5ce7)" stroke-width="2.5" fill="none"/>
+          <circle cx="12" cy="12" r="4" fill="var(--accent-color, #6c5ce7)"/>
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="var(--accent-color, #6c5ce7)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">PULSE<span class="logo-accent">.tv</span></span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button onclick="PulseApp.toggleAudioOnly()" class="icon-btn" id="audio-only-btn" title="Audio Only Mode">
+        <i class="fa-solid fa-music"></i>
+      </button>
+      <button onclick="PulseApp.openEPG()" class="icon-btn" title="TV Guide">
+        <i class="fa-solid fa-calendar-days"></i>
+      </button>
+      <button onclick="PulseApp.toggleFullscreen()" class="icon-btn" title="Fullscreen">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+      <button onclick="PulseApp.openSettings()" class="icon-btn" title="Settings">
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+      <button onclick="PulseApp.toggleSidebar('right')" class="icon-btn" id="right-sidebar-toggle-btn" title="Toggle Ad Panel">
+        <i class="fa-solid fa-rectangle-ad"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    
+    <!-- Left Sidebar Overlay -->
+    <div class="sidebar-overlay" id="left-sidebar-overlay" onclick="PulseApp.closeSidebar('left')"></div>
+    
+    <!-- Left Sidebar (Navigation) -->
+    <aside class="sidebar sidebar-left" id="left-sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-header-title">Navigation</span>
+        <button class="icon-btn sidebar-close-btn" onclick="PulseApp.closeSidebar('left')" title="Close sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      
+      <div class="sidebar-search">
+        <div class="search-field">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="search-input" placeholder="Search channels…" oninput="PulseApp.filterChannels()" />
+        </div>
+      </div>
+      
+      <div class="recently-watched" id="recently-watched" style="display:none;">
+        <div class="nav-section-label">Recently Watched</div>
+        <div id="recently-watched-list"></div>
+        <div class="nav-divider"></div>
+      </div>
+      
+      <div class="sidebar-nav">
+        <button class="nav-btn active" data-cat="All" onclick="PulseApp.setCategory('All', this)">
+          <i class="fa-solid fa-house-chimney"></i> All Channels
+        </button>
+        <button class="nav-btn" data-cat="Favorites" onclick="PulseApp.setCategory('Favorites', this)">
+          <i class="fa-solid fa-heart"></i> Favorites
+        </button>
+        <button class="nav-btn" data-cat="History" onclick="PulseApp.setCategory('History', this)">
+          <i class="fa-solid fa-clock-rotate-left"></i> Watch History
+        </button>
+        <div class="nav-divider"></div>
+        <div class="nav-section-label">Categories</div>
+        <div id="category-list"></div>
+      </div>
+      
+      <div class="sidebar-footer">
+        <button class="import-btn" onclick="PulseApp.openM3UImport()" title="Import M3U Playlist">
+          <i class="fa-solid fa-file-import"></i> Import Playlist
+        </button>
+        <button class="import-btn" onclick="PulseApp.exportFavorites()" title="Export Favorites">
+          <i class="fa-solid fa-file-export"></i> Export Favorites
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content-area">
+      
+      <!-- Mini Player -->
+      <div class="mini-player" id="mini-player" style="display:none;">
+        <div class="mini-player-header">
+          <span id="mini-player-title">—</span>
+          <div class="mini-player-controls">
+            <button onclick="PulseApp.prevChannel()" class="mini-btn"><i class="fa-solid fa-backward-step"></i></button>
+            <button onclick="PulseApp.togglePlay()" class="mini-btn"><i class="fa-solid fa-play"></i></button>
+            <button onclick="PulseApp.nextChannel()" class="mini-btn"><i class="fa-solid fa-forward-step"></i></button>
+            <button onclick="PulseApp.closeMiniPlayer()" class="mini-btn"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
+        <video id="mini-video-player" playsinline crossorigin="anonymous" muted></video>
+      </div>
+
+      <!-- Player -->
+      <div class="player-container">
+        <div class="video-wrapper" id="video-wrapper">
+          <video id="video-player" playsinline crossorigin="anonymous"></video>
+          
+          <!-- Audio Only Overlay -->
+          <div class="audio-only-overlay" id="audio-only-overlay" style="display:none;">
+            <div class="audio-only-content">
+              <i class="fa-solid fa-music"></i>
+              <span>Audio Only Mode</span>
+              <div class="audio-visualizer"><div class="av-bar"></div><div class="av-bar"></div><div class="av-bar"></div><div class="av-bar"></div><div class="av-bar"></div></div>
+            </div>
+          </div>
+          
+          <!-- Double-tap -->
+          <div class="dbl-tap dbl-tap-left" id="dbl-tap-left"><i class="fa-solid fa-backward-fast"></i><span>-10s</span></div>
+          <div class="dbl-tap dbl-tap-right" id="dbl-tap-right"><i class="fa-solid fa-forward-fast"></i><span>+10s</span></div>
+          
+          <!-- Top overlay -->
+          <div class="player-top-overlay">
+            <div class="player-top-left">
+              <div class="channel-info-badge" id="channel-info-badge">
+                <i class="fa-solid fa-satellite-dish"></i>
+                <span id="channel-name-display">Select a channel</span>
+              </div>
+            </div>
+            <div class="player-top-center">
+              <span class="stream-health" id="stream-health" style="display:none;"><span class="health-dot"></span></span>
+            </div>
+            <div class="player-top-right">
+              <span class="live-badge" id="live-badge" style="display:none;"><span class="live-dot"></span> LIVE</span>
+              <button class="go-live-btn" id="go-live-btn" style="display:none;" onclick="PulseApp.goLive()"><i class="fa-solid fa-forward"></i> LIVE</button>
+            </div>
+          </div>
+          
+          <!-- Loading -->
+          <div class="loading-spinner" id="loading-spinner" style="display:none;"><div class="spinner-dots"><div></div><div></div><div></div></div></div>
+          
+          <!-- Error -->
+          <div class="error-message" id="error-message" style="display:none;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <p id="error-message-text">Stream unavailable</p>
+            <button onclick="PulseApp.retryStream()"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-bar-container" id="progress-bar-container">
+          <div class="progress-bar-track" id="progress-track">
+            <div class="progress-bar-buffer" id="progress-buffer"></div>
+            <div class="progress-bar-played" id="progress-played"></div>
+            <div class="progress-bar-thumb" id="progress-thumb"></div>
+            <div class="seek-tooltip" id="seek-tooltip">0:00</div>
+          </div>
+        </div>
+        
+        <!-- Player Controls -->
+        <div class="player-controls">
+          <div class="controls-left">
+            <button onclick="PulseApp.prevChannel()" class="ctrl-btn" title="Previous channel"><i class="fa-solid fa-backward-step"></i></button>
+          </div>
+          <div class="controls-center">
+            <button onclick="PulseApp.togglePlay()" class="ctrl-btn ctrl-btn-play" id="play-btn" title="Play / Pause"><i class="fa-solid fa-play"></i></button>
+          </div>
+          <div class="controls-right">
+            <button onclick="PulseApp.nextChannel()" class="ctrl-btn" title="Next channel"><i class="fa-solid fa-forward-step"></i></button>
+          </div>
+        </div>
+        
+        <!-- Secondary Controls -->
+        <div class="player-controls-secondary">
+          <button onclick="PulseApp.toggleMute()" class="ctrl-btn-sm" id="mute-btn" title="Mute"><i class="fa-solid fa-volume-high"></i></button>
+          <input type="range" id="volume-slider" min="0" max="200" value="100" oninput="PulseApp.changeVolume(this.value)" title="Volume (Boost up to 200%)" />
+          <button onclick="PulseApp.toggleVolumeBoost()" class="ctrl-btn-sm" id="boost-btn" title="Volume Boost"><i class="fa-solid fa-bolt"></i></button>
+          <span id="time-display" class="live-time-display">0:00</span>
+          <span id="stream-uptime" class="stream-uptime" style="display:none;"></span>
+          <div class="controls-spacer"></div>
+          <div class="quality-selector">
+            <select id="quality-levels" onchange="PulseApp.changeQuality(this.value)" title="Quality"><option value="-1">Auto</option></select>
+          </div>
+          <button onclick="PulseApp.toggleMiniPlayer()" class="ctrl-btn-sm" title="Mini Player"><i class="fa-solid fa-window-restore"></i></button>
+          <button onclick="PulseApp.togglePiP()" class="ctrl-btn-sm" title="Picture in Picture"><i class="fa-solid fa-rectangle-ad"></i></button>
+          <button onclick="PulseApp.toggleFullscreen()" class="ctrl-btn-sm" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
+        </div>
+      </div>
+
+      <!-- Diagnostics Bar - Real Data -->
+      <div class="diagnostics-bar" id="diagnostics-bar">
+        <div class="diag-item">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Buffer</span>
+          <strong id="diag-buffer">—</strong>
+        </div>
+        <div class="diag-item">
+          <i class="fa-solid fa-display"></i>
+          <span>Resolution</span>
+          <strong id="diag-resolution">—</strong>
+        </div>
+        <div class="diag-item">
+          <i class="fa-solid fa-clock"></i>
+          <span>Latency</span>
+          <strong id="diag-latency">—</strong>
+        </div>
+        <div class="diag-item">
+          <i class="fa-solid fa-signal"></i>
+          <span>Bandwidth</span>
+          <strong id="diag-bandwidth">—</strong>
+        </div>
+      </div>
+
+      <!-- Channel Grid -->
+      <div class="channels-section">
+        <div class="channels-header">
+          <h2 id="section-title">All Channels</h2>
+          <span class="channels-count" id="channels-count"></span>
+        </div>
+        <div class="channel-grid channel-grid--skeleton" id="skeleton-grid" style="display:none;"></div>
+        <div class="channel-grid" id="channel-grid"></div>
+        <div id="empty-message" style="display:none;">
+          <div class="empty-state"><i class="fa-solid fa-satellite-dish"></i><h3>No channels found</h3><p>Try adjusting your search.</p></div>
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="pagination-bar" id="pagination-bar" style="display:none;">
+        <div class="pagination-info" id="pagination-info"></div>
+        <div class="pagination-controls">
+          <button onclick="PulseApp.goToPage(PulseApp.currentPage - 1)" id="prev-page-btn" disabled><i class="fa-solid fa-chevron-left"></i> Prev</button>
+          <div class="pagination-pages" id="pagination-pages"></div>
+          <button onclick="PulseApp.goToPage(PulseApp.currentPage + 1)" id="next-page-btn" disabled>Next <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Right Sidebar Overlay -->
+    <div class="sidebar-overlay" id="right-sidebar-overlay" onclick="PulseApp.closeSidebar('right')"></div>
+
+    <!-- Right Sidebar (Ads) - Open by default -->
+    <aside class="sidebar sidebar-right sidebar-open" id="right-sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-header-title">Sponsored</span>
+        <button class="icon-btn sidebar-close-btn" onclick="PulseApp.closeSidebar('right')" title="Close ad panel">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      
+      <div class="ad-panel" id="ad-panel">
+        <!-- Ad 1 -->
+        <div class="ad-card">
+          <a href="https://wa.me/8801755772612?text=Hello%20Pulse.tv%20Team" target="_blank" rel="noopener">
+            <img src="/advertise/adv1.png" alt="Contact on WhatsApp" loading="lazy" onerror="this.style.display='none';this.parentNode.innerHTML='<div class=ad-placeholder><i class=fa-solid fa-rectangle-ad></i><span>Ad Space</span></div>';" />
+          </a>
+          <span class="ad-label">Sponsored</span>
+        </div>
+        
+        <!-- Ad 2 -->
+        <div class="ad-card">
+          <a href="https://wa.me/8801755772612?text=Hello%20Pulse.tv%20Team" target="_blank" rel="noopener">
+            <img src="/advertise/adv2.png" alt="Contact on WhatsApp" loading="lazy" onerror="this.style.display='none';this.parentNode.innerHTML='<div class=ad-placeholder><i class=fa-solid fa-rectangle-ad></i><span>Ad Space</span></div>';" />
+          </a>
+          <span class="ad-label">Sponsored</span>
+        </div>
+        
+        <!-- Ad 3 -->
+        <div class="ad-card">
+          <a href="https://wa.me/8801755772612?text=Hello%20Pulse.tv%20Team" target="_blank" rel="noopener">
+            <img src="/advertise/adv3.png" alt="Contact on WhatsApp" loading="lazy" onerror="this.style.display='none';this.parentNode.innerHTML='<div class=ad-placeholder><i class=fa-solid fa-rectangle-ad></i><span>Ad Space</span></div>';" />
+          </a>
+          <span class="ad-label">Sponsored</span>
+        </div>
+        
+        <!-- Ad 4 - Contact Card -->
+        <div class="ad-card">
+          <a href="https://wa.me/8801755772612?text=Hello%20Pulse.tv%20Team" target="_blank" rel="noopener" class="ad-contact-card">
+            <div class="ad-contact">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>Advertise With Us</span>
+              <strong>+880 1755-772612</strong>
+              <small>Click to chat on WhatsApp</small>
+            </div>
+          </a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- PWA Install Banner -->
+  <div id="pwa-install-banner" class="pwa-install-banner" style="display:none;">
+    <div class="pwa-install-inner">
+      <i class="fa-solid fa-mobile-screen"></i>
+      <span>Install Pulse.tv for quick access</span>
+      <button onclick="PulseApp.installPWA()">Install</button>
+      <button onclick="PulseApp.dismissPWA()" class="pwa-dismiss">&times;</button>
+    </div>
+  </div>
+
+  <!-- EPG Modal -->
+  <div class="modal-overlay" id="epg-modal" style="display:none;">
+    <div class="modal-box modal-box--lg">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-calendar-days"></i> TV Guide — <span id="epg-channel-name">—</span></h3>
+        <button onclick="PulseApp.closeEPG()" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="epg-now-playing">
+          <div class="epg-now-badge">NOW</div>
+          <div class="epg-program-title" id="epg-now-title">—</div>
+          <div class="epg-program-time" id="epg-now-time">—</div>
+          <div class="epg-progress-bar"><div class="epg-progress-fill" id="epg-now-progress"></div></div>
+        </div>
+        <div class="epg-up-next-label">Up Next</div>
+        <div class="epg-timeline" id="epg-timeline"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-modal" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-sliders"></i> Settings</h3>
+        <button onclick="PulseApp.closeSettings()" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Accent Color</label>
+          <div class="accent-colors" id="accent-colors">
+            <button data-color="#6c5ce7" style="background:#6c5ce7"></button>
+            <button data-color="#e63950" style="background:#e63950"></button>
+            <button data-color="#3b82f6" style="background:#3b82f6"></button>
+            <button data-color="#22c55e" style="background:#22c55e"></button>
+            <button data-color="#f59e0b" style="background:#f59e0b"></button>
+            <button data-color="#ec4899" style="background:#ec4899"></button>
+          </div>
+          <input type="color" id="custom-accent" value="#6c5ce7" onchange="PulseApp.setAccentColor(this.value)" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sleep Timer Modal -->
+  <div class="modal-overlay" id="sleep-timer-modal" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header"><h3><i class="fa-solid fa-clock"></i> Sleep Timer</h3><button onclick="PulseApp.closeSleepTimer()" class="modal-close-btn">&times;</button></div>
+      <div class="modal-body">
+        <div class="sleep-options">
+          <button onclick="PulseApp.setSleepTimer(15)">15 min</button>
+          <button onclick="PulseApp.setSleepTimer(30)">30 min</button>
+          <button onclick="PulseApp.setSleepTimer(60)">60 min</button>
+          <button onclick="PulseApp.setSleepTimer(120)">120 min</button>
+          <button onclick="PulseApp.setSleepTimer(0)">Cancel</button>
+        </div>
+        <div id="sleep-timer-status" class="sleep-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- M3U Modal -->
+  <div class="modal-overlay" id="m3u-modal" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header"><h3><i class="fa-solid fa-file-import"></i> Import M3U</h3><button onclick="PulseApp.closeM3UImport()" class="modal-close-btn">&times;</button></div>
+      <div class="modal-body">
+        <input type="url" id="m3u-url" placeholder="https://example.com/playlist.m3u" class="m3u-input" />
+        <p class="m3u-or">— or —</p>
+        <input type="file" id="m3u-file" accept=".m3u,.m3u8,.txt" />
+        <button onclick="PulseApp.importM3U()" class="btn-primary">Import</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="channels.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

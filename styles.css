@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   PULSE.tv — Bug-Free Stylesheet v7.3
-   All 26 issues resolved, all selectors verified
+   PULSE.tv — Stylesheet v7.5
+   Online users counter, 4-item diagnostics, stream health center
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
@@ -23,6 +23,7 @@
   --health-green: #22c55e;
   --health-yellow: #f59e0b;
   --health-red: #ef4444;
+  --online-green: #22c55e;
   --radius: 12px;
   --radius-sm: 8px;
   --radius-pill: 999px;
@@ -45,7 +46,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ═══ Scrollbars (visible on hover, scoped) ═══ */
+/* ═══ Scrollbars ═══ */
 .sidebar, .content-area, .sidebar-nav, .ad-panel, .modal-body, .continue-watching-row {
   scrollbar-width: thin;
   scrollbar-color: var(--surface3) transparent;
@@ -164,6 +165,53 @@ svg { display: block; max-width: 100%; }
 }
 .logo-accent { color: var(--accent); }
 
+/* ═══ ONLINE USERS COUNTER ═══ */
+.online-users-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: var(--radius-pill);
+  cursor: default;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-left: 6px;
+}
+.online-users-counter:hover {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+.online-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--online-green);
+  animation: onlinePulse 2s infinite;
+  flex-shrink: 0;
+}
+.online-count {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--online-green);
+  font-variant-numeric: tabular-nums;
+  min-width: 18px;
+  text-align: center;
+}
+.online-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(34, 197, 94, 0.8);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+@keyframes onlinePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+  50% { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+}
+
 /* ═══ Icon Button ═══ */
 .icon-btn {
   width: 38px; height: 38px;
@@ -201,7 +249,7 @@ svg { display: block; max-width: 100%; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SIDEBAR OVERLAY (Fixed: visibility instead of display)
+   SIDEBAR OVERLAY
    ═══════════════════════════════════════════════════════════════ */
 .sidebar-overlay {
   position: fixed; inset: 0;
@@ -233,14 +281,15 @@ svg { display: block; max-width: 100%; }
 .sidebar-left {
   width: var(--sidebar-w);
   border-right: 1px solid var(--border);
+  position: fixed; top: 0; left: 0; bottom: 0;
 }
 
 .sidebar-right {
   width: var(--ad-sidebar-w);
   border-left: 1px solid var(--border);
+  position: fixed; top: 0; right: 0; bottom: 0;
 }
 
-/* Fix: collapsed state removes borders */
 .sidebar.collapsed {
   width: 0 !important;
   overflow: hidden;
@@ -488,10 +537,23 @@ svg { display: block; max-width: 100%; }
 /* ═══════════════════════════════════════════════════════════════
    CONTENT AREA
    ═══════════════════════════════════════════════════════════════ */
-.content-area { flex: 1; padding: 24px; min-width: 0; }
+.content-area {
+  flex: 1;
+  padding: 24px;
+  min-width: 0;
+  margin-left: var(--sidebar-w);
+  margin-right: var(--ad-sidebar-w);
+  transition: margin 0.3s var(--ease-out);
+}
+
+@media (min-width: 1101px) {
+  .sidebar-right.collapsed ~ .content-area {
+    margin-right: 0;
+  }
+}
 
 /* ═══════════════════════════════════════════════════════════════
-   PLAYER CONTAINER (groups video + controls for auto-hide)
+   PLAYER CONTAINER
    ═══════════════════════════════════════════════════════════════ */
 .player-container { margin-bottom: 0; }
 
@@ -509,7 +571,7 @@ svg { display: block; max-width: 100%; }
 }
 .video-wrapper.audio-only video { opacity: 0; }
 
-/* ═══ Auto-Hide Controls (Fixed: target children of player-container) ═══ */
+/* ═══ Auto-Hide Controls ═══ */
 .player-container.controls-hidden .player-top-overlay,
 .player-container.controls-hidden .progress-bar-container,
 .player-container.controls-hidden .player-controls,
@@ -546,7 +608,9 @@ svg { display: block; max-width: 100%; }
 .dbl-tap span { font-size: 0.75rem; font-weight: 600; }
 .dbl-tap svg { width: 24px; height: 24px; }
 
-/* ═══ Player Top Overlay ═══ */
+/* ═══════════════════════════════════════════════════════════════
+   PLAYER TOP OVERLAY — Stream health in center
+   ═══════════════════════════════════════════════════════════════ */
 .player-top-overlay {
   position: absolute; top: 0; left: 0; right: 0;
   padding: 14px 18px; z-index: 5;
@@ -555,8 +619,15 @@ svg { display: block; max-width: 100%; }
   transition: opacity 0.3s;
 }
 .player-top-left { flex: 0 0 auto; }
-.player-top-center { flex: 1; display: flex; justify-content: center; gap: 8px; }
+.player-top-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
 .player-top-right { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
+
 .channel-info-badge {
   display: flex; align-items: center; gap: 8px;
   padding: 6px 14px;
@@ -567,20 +638,29 @@ svg { display: block; max-width: 100%; }
   backdrop-filter: blur(8px);
 }
 
-/* ═══ Stream Health ═══ */
+/* ═══ Stream Health (left icon + buffer center) ═══ */
 .stream-health {
-  display: flex; align-items: center; gap: 4px;
-  padding: 4px 10px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 12px;
   background: rgba(0,0,0,0.5);
   border-radius: var(--radius-pill);
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 .health-dot {
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--health-green);
   transition: background 0.3s;
+  flex-shrink: 0;
 }
 .health-dot.buffering { background: var(--health-yellow); animation: healthPulse 1s infinite; }
 .health-dot.poor { background: var(--health-red); animation: healthPulse 0.5s infinite; }
+.health-text {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
 
 @keyframes healthPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
@@ -593,7 +673,7 @@ svg { display: block; max-width: 100%; }
 }
 .dvr-buffer svg { width: 12px; height: 12px; }
 
-/* ═══ LIVE Badge (Fixed: stop animation when hidden) ═══ */
+/* ═══ LIVE Badge ═══ */
 .live-badge {
   display: flex; align-items: center; gap: 6px;
   padding: 5px 12px; border-radius: var(--radius-pill);
@@ -624,7 +704,7 @@ svg { display: block; max-width: 100%; }
   50% { box-shadow: 0 0 20px rgba(230,57,80,0.8); }
 }
 
-/* ═══ Live Score Overlay (Fixed: use percentage positioning) ═══ */
+/* ═══ Live Score Overlay ═══ */
 .live-score-overlay {
   position: absolute; top: 60px; right: 10px; z-index: 10;
   background: rgba(0,0,0,0.85);
@@ -680,7 +760,7 @@ svg { display: block; max-width: 100%; }
 }
 .chapter-marker:hover { color: #fff; background: rgba(0,0,0,0.85); }
 
-/* ═══ Loading Spinner (Fixed: stop animation when hidden) ═══ */
+/* ═══ Loading Spinner ═══ */
 .loading-spinner {
   position: absolute; inset: 0;
   background: rgba(0,0,0,0.5);
@@ -819,6 +899,7 @@ svg { display: block; max-width: 100%; }
 }
 .ctrl-btn-sm svg { width: 16px; height: 16px; }
 .ctrl-btn-sm:hover { background: var(--surface2); color: var(--text); }
+.ctrl-btn-sm.active { color: var(--accent); background: var(--accent-dim); }
 
 .player-controls-secondary input[type="range"] {
   width: 80px; height: 4px;
@@ -879,7 +960,7 @@ svg { display: block; max-width: 100%; }
 .card-rating { display: flex; gap: 1px; margin-top: 4px; }
 
 /* ═══════════════════════════════════════════════════════════════
-   DIAGNOSTICS BAR
+   DIAGNOSTICS BAR — 4 items: Buffer, Resolution, Latency, Bandwidth
    ═══════════════════════════════════════════════════════════════ */
 .diagnostics-bar {
   display: flex; align-items: center; flex-wrap: wrap;
@@ -889,7 +970,7 @@ svg { display: block; max-width: 100%; }
 }
 .diag-item { display: flex; align-items: center; gap: 8px; }
 .diag-item span { font-weight: 500; }
-.diag-item strong { color: var(--text); font-size: 13px; font-variant-numeric: tabular-nums; }
+.diag-item strong { color: var(--text); font-size: 13px; font-variant-numeric: tabular-nums; transition: color 0.3s; }
 
 /* ═══════════════════════════════════════════════════════════════
    CONTINUE WATCHING SECTION
@@ -1115,6 +1196,7 @@ svg { display: block; max-width: 100%; }
   overflow-y: auto;
 }
 .modal-box--lg { max-width: 600px; }
+.modal-box--sm { max-width: 340px; }
 
 @keyframes modalIn {
   from { opacity: 0; transform: scale(0.95) translateY(10px); }
@@ -1180,36 +1262,6 @@ svg { display: block; max-width: 100%; }
   display: flex; flex-direction: column; gap: 8px;
 }
 
-/* ═══ EPG ═══ */
-.epg-now-playing {
-  background: var(--surface3); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px;
-}
-.epg-now-badge {
-  display: inline-block; background: var(--live-red); color: #fff;
-  font-size: 10px; font-weight: 800; padding: 2px 8px;
-  border-radius: var(--radius-sm); margin-bottom: 8px;
-}
-.epg-program-title { font-weight: 600; font-size: 15px; }
-.epg-program-time { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-.epg-progress-bar {
-  height: 4px; background: rgba(255,255,255,0.1);
-  border-radius: 2px; margin-top: 10px; overflow: hidden;
-}
-.epg-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 1s linear; }
-.epg-up-next-label {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1px; color: var(--text-muted);
-}
-.epg-timeline { display: flex; flex-direction: column; gap: 8px; }
-.epg-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 14px; background: var(--surface3);
-  border-radius: var(--radius-sm); font-size: 13px;
-}
-.epg-item-time { font-size: 11px; color: var(--accent); font-weight: 600; min-width: 60px; }
-.epg-item-title { font-weight: 500; }
-
 /* ═══ Sleep Timer ═══ */
 .sleep-options { display: flex; flex-wrap: wrap; gap: 8px; }
 .sleep-options button {
@@ -1259,7 +1311,7 @@ kbd {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TOAST (Fixed: z-index above modals)
+   TOAST
    ═══════════════════════════════════════════════════════════════ */
 .toast-container {
   position: fixed; bottom: 20px; right: 20px; z-index: 2001;
@@ -1290,10 +1342,16 @@ kbd {
   .sidebar-right { width: 0; border-left: none; }
   .sidebar-right.open,
   .sidebar-right.sidebar-open { width: 280px; border-left: 1px solid var(--border); }
+  .content-area { margin-right: 0; }
 }
 
 @media (max-width: 900px) {
-  .content-area { padding: 16px; }
+  .content-area {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 16px;
+  }
+  .sidebar-left, .sidebar-right { position: fixed; }
   .channel-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .channel-grid--skeleton { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .player-controls { gap: 32px; }
@@ -1319,6 +1377,9 @@ kbd {
   .cw-card { min-width: 130px; }
   .toast-container { right: 10px; bottom: 10px; }
   .toast { max-width: 280px; font-size: 13px; }
+  .online-users-counter { padding: 3px 8px; margin-left: 4px; }
+  .online-count { font-size: 11px; }
+  .online-label { font-size: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -4,9 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0f" />
-  <meta name="description" content="Pulse.tv — Premium live TV streaming with 500+ channels" />
+  <meta name="description" content="Pulse.tv — Premium live TV streaming with 500+ channels. Watch news, sports, entertainment, movies and more." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pulse.tv" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="format-detection" content="telephone=no" />
   <title>Pulse.tv — Live TV Streaming</title>
 
   <link rel="manifest" href="manifest.json" />
@@ -15,7 +18,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest" fetchpriority="high"></script>
   <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1" async></script>
@@ -24,17 +27,20 @@
 </head>
 <body class="theme-dark">
 
+  <!-- Skip Navigation -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Error Boundary -->
-  <div id="error-boundary" class="error-boundary" hidden>
+  <div id="error-boundary" class="error-boundary" hidden role="alert" aria-live="assertive">
     <div class="error-boundary-inner">
-      <svg class="icon-sm" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 4l7.5 13h-15L12 6zm-1 5h2v4h-2v-4zm0 6h2v2h-2v-2z" fill="currentColor"/></svg>
+      <svg class="icon-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 22h20L12 2zm0 4l7.5 13h-15L12 6zm-1 5h2v4h-2v-4zm0 6h2v2h-2v-2z" fill="currentColor"/></svg>
       <span>Something went wrong</span>
       <button onclick="location.reload()">Reload App</button>
     </div>
   </div>
 
   <!-- Network Banner -->
-  <div id="network-banner" class="network-banner" hidden>
+  <div id="network-banner" class="network-banner" hidden role="alert" aria-live="assertive">
     <div class="network-banner-inner">
       <span>No internet connection</span>
       <button onclick="location.reload()">Retry</button>
@@ -42,148 +48,173 @@
   </div>
 
   <!-- Header -->
-  <header class="top-header">
+  <header class="top-header" role="banner">
     <div class="header-left">
-      <button class="icon-btn sidebar-toggle-btn" id="sidebar-toggle-btn" onclick="PulseApp.toggleSidebar('left')" title="Toggle Navigation">
-        <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <button class="icon-btn sidebar-toggle-btn" id="sidebar-toggle-btn"
+        onclick="PulseApp.toggleSidebar('left')"
+        aria-label="Toggle navigation"
+        aria-expanded="true"
+        aria-controls="left-sidebar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
-      <div class="logo-area">
-        <svg class="brand-icon" width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="var(--accent-color, #6c5ce7)" stroke-width="2.5" fill="none"/>
-          <circle cx="12" cy="12" r="4" fill="var(--accent-color, #6c5ce7)"/>
-          <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="var(--accent-color, #6c5ce7)" stroke-width="1.5" stroke-linecap="round"/>
+      <div class="logo-area" role="button" tabindex="0" aria-label="Pulse.tv — go to home">
+        <svg class="brand-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="var(--accent)" stroke-width="2.5" fill="none"/>
+          <circle cx="12" cy="12" r="4" fill="var(--accent)"/>
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
         <span class="logo-text">PULSE<span class="logo-accent">.tv</span></span>
-        <div class="online-users-counter" id="online-users-counter" title="Users online now">
-          <span class="online-dot"></span>
-          <span class="online-count">0</span>
+        <div class="online-users-counter" id="online-users-counter" aria-label="Viewers online">
+          <span class="online-dot" aria-hidden="true"></span>
+          <span class="online-count" aria-live="polite">0</span>
           <span class="online-label">online</span>
         </div>
-        <div class="kids-mode-indicator" id="kids-mode-indicator" style="display:none;" title="Kids Mode Active">
-          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+        <div class="kids-mode-indicator" id="kids-mode-indicator" style="display:none;" aria-label="Kids Mode is active">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
           <span>Kids Mode</span>
         </div>
       </div>
     </div>
     <div class="header-actions">
-      <span class="data-saver-badge" id="data-saver-badge" hidden title="Data Saver Active">DS</span>
-      <button onclick="PulseApp.toggleAudioOnly()" class="icon-btn" id="audio-only-btn" title="Music Mode">
-        <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      <span class="data-saver-badge" id="data-saver-badge" hidden aria-label="Data Saver active" title="Data Saver Active">DS</span>
+      <button onclick="PulseApp.toggleAudioOnly()" class="icon-btn" id="audio-only-btn" title="Audio Only Mode" aria-label="Toggle audio only mode" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="2" fill="none"/></svg>
       </button>
-      <button onclick="PulseApp.openSettings()" class="icon-btn" title="Settings">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      <button onclick="PulseApp.openSettings()" class="icon-btn" title="Settings" aria-label="Open settings" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
       </button>
     </div>
   </header>
 
   <!-- Main Layout -->
   <div class="main-layout">
-    
+
     <!-- Left Sidebar Overlay -->
-    <div class="sidebar-overlay" id="left-sidebar-overlay" onclick="PulseApp.closeSidebar('left')"></div>
-    
+    <div class="sidebar-overlay" id="left-sidebar-overlay" onclick="PulseApp.closeSidebar('left')" aria-hidden="true"></div>
+
     <!-- Left Sidebar -->
-    <aside class="sidebar sidebar-left" id="left-sidebar">
+    <aside class="sidebar sidebar-left sidebar-open" id="left-sidebar" aria-label="Channel navigation">
       <div class="sidebar-header">
         <span class="sidebar-header-title">Navigation</span>
-        <button class="icon-btn sidebar-close-btn" onclick="PulseApp.closeSidebar('left')">
-          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <button class="icon-btn sidebar-close-btn" onclick="PulseApp.closeSidebar('left')" aria-label="Close navigation">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
       </div>
-      
+
       <div class="sidebar-search">
-        <div class="search-field">
-          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <input type="text" id="search-input" placeholder="Search channels..." />
-          <button class="voice-trigger" id="voice-trigger" onclick="PulseApp.startVoiceSearch()" title="Voice Search">
-            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <div class="search-field" role="search">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input type="search"
+            id="search-input"
+            placeholder="Search channels…"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="Search channels"
+            aria-autocomplete="list"
+            aria-controls="channel-grid" />
+          <button class="voice-trigger" id="voice-trigger" onclick="PulseApp.startVoiceSearch()" title="Voice Search" aria-label="Start voice search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
         </div>
-        <div class="voice-listening" id="voice-listening" hidden>
-          <div class="voice-pulse"></div>
-          <span>Listening...</span>
-          <button onclick="PulseApp.stopVoiceSearch()">Stop</button>
+        <div class="voice-listening" id="voice-listening" hidden role="status" aria-live="polite">
+          <div class="voice-pulse" aria-hidden="true"></div>
+          <span>Listening…</span>
+          <button onclick="PulseApp.stopVoiceSearch()" aria-label="Stop voice search">Stop</button>
         </div>
       </div>
-      
+
       <div class="continue-watching-sidebar" id="continue-watching-sidebar" hidden>
         <div class="nav-section-label">Continue Watching</div>
         <div id="continue-watching-list"></div>
-        <div class="nav-divider"></div>
+        <div class="nav-divider" role="separator"></div>
       </div>
-      
+
       <div class="recently-watched" id="recently-watched" hidden>
         <div class="nav-section-label">Recently Watched</div>
         <div id="recently-watched-list"></div>
-        <div class="nav-divider"></div>
+        <div class="nav-divider" role="separator"></div>
       </div>
-      
-      <div class="sidebar-nav">
-        <button class="nav-btn active" data-cat="All">All Channels</button>
-        <button class="nav-btn" data-cat="Favorites">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      <nav class="sidebar-nav" aria-label="Channel categories">
+        <button class="nav-btn active" data-cat="All" aria-current="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" fill="none"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" fill="none"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" fill="none"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          <span>All Channels</span>
+        </button>
+        <button class="nav-btn" data-cat="Favorites" aria-label="Favorites">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Favorites</span>
-          <span class="nav-item-badge" id="fav-badge" hidden>0</span>
+          <span class="nav-item-badge" id="fav-badge" hidden aria-label="favorites count">0</span>
         </button>
-        <button class="nav-btn" data-cat="Watchlist">
-          <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button class="nav-btn" data-cat="Watchlist" aria-label="Watchlist">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Watchlist</span>
-          <span class="nav-item-badge" id="watchlist-badge" hidden>0</span>
+          <span class="nav-item-badge" id="watchlist-badge" hidden aria-label="watchlist count">0</span>
         </button>
-        <button class="nav-btn" data-cat="History">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <button class="nav-btn" data-cat="History" aria-label="Watch history">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           <span>Watch History</span>
         </button>
-        <div class="nav-divider"></div>
-        <div class="nav-section-label">Categories</div>
-        <div id="category-list"></div>
-      </div>
-      
+        <div class="nav-divider" role="separator"></div>
+        <div class="nav-section-label" id="categories-label">Categories</div>
+        <div id="category-list" role="group" aria-labelledby="categories-label"></div>
+      </nav>
+
       <div class="sidebar-footer">
-        <button class="import-btn" onclick="PulseApp.openM3UImport()">
-          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button class="import-btn" onclick="PulseApp.openM3UImport()" aria-label="Import M3U playlist">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Import Playlist</span>
         </button>
-        <button class="import-btn" onclick="PulseApp.exportFavorites()">
-          <svg viewBox="0 0 24 24"><path d="M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button class="import-btn" onclick="PulseApp.exportFavorites()" aria-label="Export favorites as M3U">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Export Favorites</span>
         </button>
       </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="content-area">
-      
+    <main class="content-area" id="main-content">
+
       <!-- Player -->
-      <div class="player-container">
+      <section class="player-container" aria-label="Video player">
         <div class="video-wrapper" id="video-wrapper">
-          <video id="video-player" playsinline crossorigin="anonymous"></video>
-          
+          <video id="video-player"
+            playsinline
+            crossorigin="anonymous"
+            aria-label="Live TV stream"
+            preload="none"></video>
+
           <!-- Live Score Overlay -->
-          <div class="live-score-overlay" id="live-score-overlay" hidden>
+          <div class="live-score-overlay" id="live-score-overlay" hidden role="complementary" aria-label="Live score">
             <div class="live-score-header">
-              <span class="live-score-label">LIVE SCORE</span>
-              <button class="live-score-close" onclick="PulseApp.toggleScoreOverlay()">
-                <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <span class="live-score-label" aria-live="polite">LIVE SCORE</span>
+              <button class="live-score-close" onclick="PulseApp.toggleScoreOverlay()" aria-label="Close score overlay">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               </button>
             </div>
-            <div class="live-score-content" id="live-score-content"></div>
+            <div class="live-score-content" id="live-score-content" aria-live="polite"></div>
           </div>
-          
+
           <!-- Audio Only Overlay -->
-          <div class="audio-only-overlay" id="audio-only-overlay" hidden>
+          <div class="audio-only-overlay" id="audio-only-overlay" hidden aria-hidden="true">
             <div class="audio-only-content">
-              <svg class="audio-only-icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+              <svg class="audio-only-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="2" fill="none"/></svg>
               <span>Audio Only Mode</span>
             </div>
           </div>
-          
-          <!-- Double-tap -->
-          <div class="dbl-tap dbl-tap-left" id="dbl-tap-left"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>-10s</span></div>
-          <div class="dbl-tap dbl-tap-right" id="dbl-tap-right"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>+10s</span></div>
-          
-          <!-- Top overlay -->
-          <div class="player-top-overlay">
+
+          <!-- Double-tap Zones -->
+          <div class="dbl-tap dbl-tap-left" id="dbl-tap-left" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>−10s</span>
+          </div>
+          <div class="dbl-tap dbl-tap-right" id="dbl-tap-right" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>+10s</span>
+          </div>
+
+          <!-- Top Overlay -->
+          <div class="player-top-overlay" aria-hidden="true">
             <div class="player-top-left">
               <div class="channel-info-badge" id="channel-info-badge">
                 <span id="channel-name-display">Select a channel</span>
@@ -191,181 +222,212 @@
             </div>
             <div class="player-top-center">
               <span class="stream-health" id="stream-health" hidden>
-                <span class="health-dot"></span>
-                <span class="health-text" id="health-text">-</span>
+                <span class="health-dot" aria-hidden="true"></span>
+                <span class="health-text" id="health-text">—</span>
               </span>
               <span class="dvr-buffer" id="dvr-buffer" hidden>
-                <span id="dvr-buffer-time">-0:00</span>
+                <span id="dvr-buffer-time">−0:00</span>
               </span>
             </div>
             <div class="player-top-right">
-              <span class="live-badge" id="live-badge" hidden><span class="live-dot"></span> LIVE</span>
-              <button class="go-live-btn" id="go-live-btn" hidden onclick="PulseApp.goLive()">LIVE</button>
+              <span class="live-badge" id="live-badge" hidden>
+                <span class="live-dot" aria-hidden="true"></span>
+                LIVE
+              </span>
+              <button class="go-live-btn" id="go-live-btn" hidden onclick="PulseApp.goLive()" aria-label="Go to live">GO LIVE</button>
             </div>
           </div>
-          
+
           <!-- Chapter Markers -->
-          <div class="chapter-markers" id="chapter-markers" hidden></div>
-          
-          <!-- Loading -->
-          <div class="loading-spinner" id="loading-spinner" hidden><div class="spinner-dots"><div></div><div></div><div></div></div></div>
-          
-          <!-- Error -->
-          <div class="error-message" id="error-message" hidden>
-            <svg class="error-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="chapter-markers" id="chapter-markers" hidden aria-hidden="true"></div>
+
+          <!-- Loading Spinner -->
+          <div class="loading-spinner" id="loading-spinner" hidden role="status" aria-label="Loading stream">
+            <div class="spinner-dots" aria-hidden="true"><div></div><div></div><div></div></div>
+          </div>
+
+          <!-- Error Message -->
+          <div class="error-message" id="error-message" hidden role="alert">
+            <svg class="error-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             <p id="error-message-text">Stream unavailable</p>
             <button onclick="PulseApp.retryStream()">Retry</button>
           </div>
         </div>
-        
+
         <!-- Progress Bar -->
-        <div class="progress-bar-container" id="progress-bar-container">
+        <div class="progress-bar-container" id="progress-bar-container" role="slider" aria-label="Stream position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
           <div class="progress-bar-track" id="progress-track">
-            <div class="progress-bar-buffer" id="progress-buffer"></div>
-            <div class="progress-bar-played" id="progress-played"></div>
-            <div class="chapter-dots" id="chapter-dots"></div>
-            <div class="progress-bar-thumb" id="progress-thumb"></div>
-            <div class="seek-tooltip" id="seek-tooltip">0:00</div>
+            <div class="progress-bar-buffer" id="progress-buffer" aria-hidden="true"></div>
+            <div class="progress-bar-played" id="progress-played" aria-hidden="true"></div>
+            <div class="chapter-dots" id="chapter-dots" aria-hidden="true"></div>
+            <div class="progress-bar-thumb" id="progress-thumb" aria-hidden="true"></div>
+            <div class="seek-tooltip" id="seek-tooltip" aria-hidden="true">0:00</div>
           </div>
         </div>
-        
-        <!-- Player Controls -->
-        <div class="player-controls">
+
+        <!-- Primary Player Controls -->
+        <div class="player-controls" role="group" aria-label="Playback controls">
           <div class="controls-left">
-            <button onclick="PulseApp.prevChannel()" class="ctrl-btn" title="Previous channel">
-              <svg viewBox="0 0 24 24"><path d="M19 20L9 12l10-8v16zM5 19V5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <button onclick="PulseApp.prevChannel()" class="ctrl-btn" title="Previous channel" aria-label="Previous channel">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 20L9 12l10-8v16zM5 19V5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
           <div class="controls-center">
-            <button onclick="PulseApp.togglePlay()" class="ctrl-btn ctrl-btn-play" id="play-btn" title="Play / Pause">
-              <svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" fill="currentColor"/></svg>
+            <button onclick="PulseApp.togglePlay()" class="ctrl-btn ctrl-btn-play" id="play-btn" title="Play / Pause" aria-label="Play">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 9-14 9V3z" fill="currentColor"/></svg>
             </button>
           </div>
           <div class="controls-right">
-            <button onclick="PulseApp.nextChannel()" class="ctrl-btn" title="Next channel">
-              <svg viewBox="0 0 24 24"><path d="M5 4l10 8-10 8V4zM19 5v14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <button onclick="PulseApp.nextChannel()" class="ctrl-btn" title="Next channel" aria-label="Next channel">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l10 8-10 8V4zM19 5v14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
         </div>
-        
+
         <!-- Secondary Controls -->
-        <div class="player-controls-secondary">
-          <button onclick="PulseApp.toggleMute()" class="ctrl-btn-sm" id="mute-btn" title="Mute">
-            <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <div class="player-controls-secondary" role="group" aria-label="Player options">
+          <button onclick="PulseApp.toggleMute()" class="ctrl-btn-sm" id="mute-btn" title="Mute / Unmute" aria-label="Mute">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" stroke="currentColor" stroke-width="2" fill="none"/></svg>
           </button>
-          <input type="range" id="volume-slider" min="0" max="200" value="100" oninput="PulseApp.changeVolume(this.value)" title="Volume" />
-          <button onclick="PulseApp.toggleVolumeBoost()" class="ctrl-btn-sm" id="boost-btn" title="Volume Boost">
-            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+          <label class="sr-only" for="volume-slider">Volume</label>
+          <input type="range" id="volume-slider" min="0" max="100" value="100"
+            oninput="PulseApp.changeVolume(this.value)"
+            title="Volume"
+            aria-label="Volume" />
+
+          <button onclick="PulseApp.toggleVolumeBoost()" class="ctrl-btn-sm" id="boost-btn" title="Volume Boost (200%)" aria-label="Toggle volume boost" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <span id="time-display" class="live-time-display">0:00</span>
-          <span id="stream-uptime" class="stream-uptime" hidden></span>
-          <div class="controls-spacer"></div>
-          
-          <select id="playback-speed" onchange="PulseApp.setPlaybackSpeed(this.value)" title="Playback Speed" class="speed-select">
-            <option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option>
-            <option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option>
+
+          <span id="time-display" class="live-time-display" aria-live="off" aria-label="Playback time">0:00</span>
+          <span id="stream-uptime" class="stream-uptime" hidden aria-label="Stream uptime"></span>
+
+          <div class="controls-spacer" aria-hidden="true"></div>
+
+          <label class="sr-only" for="playback-speed">Playback speed</label>
+          <select id="playback-speed" onchange="PulseApp.setPlaybackSpeed(this.value)" title="Playback Speed" class="speed-select" aria-label="Playback speed">
+            <option value="0.5">0.5×</option>
+            <option value="0.75">0.75×</option>
+            <option value="1" selected>1×</option>
+            <option value="1.25">1.25×</option>
+            <option value="1.5">1.5×</option>
+            <option value="2">2×</option>
           </select>
-          
+
           <div class="quality-selector">
-            <select id="quality-levels" onchange="PulseApp.changeQuality(this.value)" title="Quality"><option value="-1">Auto</option></select>
+            <label class="sr-only" for="quality-levels">Quality</label>
+            <select id="quality-levels" onchange="PulseApp.changeQuality(this.value)" title="Quality" aria-label="Stream quality">
+              <option value="-1">Auto</option>
+            </select>
           </div>
-          
-          <div class="rating-stars" id="rating-stars" title="Rate this channel">
-            <button data-rating="1"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
-            <button data-rating="2"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
-            <button data-rating="3"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
-            <button data-rating="4"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
-            <button data-rating="5"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
-            <span class="rating-count" id="rating-count"></span>
+
+          <div class="rating-stars" id="rating-stars" role="group" aria-label="Rate this channel">
+            <button data-rating="1" aria-label="Rate 1 star" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
+            <button data-rating="2" aria-label="Rate 2 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
+            <button data-rating="3" aria-label="Rate 3 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
+            <button data-rating="4" aria-label="Rate 4 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
+            <button data-rating="5" aria-label="Rate 5 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
+            <span class="rating-count" id="rating-count" aria-live="polite"></span>
           </div>
-          
-          <button onclick="PulseApp.openShareMenu()" class="ctrl-btn-sm" title="Share">
-            <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" stroke-width="2"/></svg>
+
+          <button onclick="PulseApp.openShareMenu()" class="ctrl-btn-sm" title="Share" aria-label="Share channel" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" stroke-width="2"/></svg>
           </button>
-          <button onclick="PulseApp.togglePiP()" class="ctrl-btn-sm" title="Picture-in-Picture">
-            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect x="13" y="8" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+
+          <button onclick="PulseApp.togglePiP()" class="ctrl-btn-sm" title="Picture-in-Picture" aria-label="Toggle picture-in-picture">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect x="13" y="8" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2" fill="none"/></svg>
           </button>
-          <button onclick="PulseApp.toggleFullscreen()" class="ctrl-btn-sm" title="Fullscreen">
-            <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+
+          <button onclick="PulseApp.toggleFullscreen()" class="ctrl-btn-sm" title="Fullscreen" aria-label="Toggle fullscreen">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
           </button>
         </div>
-      </div>
+      </section>
 
       <!-- Diagnostics Bar -->
-      <div class="diagnostics-bar" id="diagnostics-bar">
-        <div class="diag-item"><span>Buffer</span><strong id="diag-buffer">-</strong></div>
-        <div class="diag-item"><span>Resolution</span><strong id="diag-resolution">-</strong></div>
-        <div class="diag-item"><span>Bandwidth</span><strong id="diag-bandwidth">-</strong></div>
+      <div class="diagnostics-bar" id="diagnostics-bar" aria-label="Stream diagnostics" aria-live="off">
+        <div class="diag-item"><span>Buffer</span><strong id="diag-buffer">—</strong></div>
+        <div class="diag-item"><span>Resolution</span><strong id="diag-resolution">—</strong></div>
+        <div class="diag-item"><span>Bandwidth</span><strong id="diag-bandwidth">—</strong></div>
       </div>
 
-      <!-- Continue Watching Row -->
-      <div class="continue-watching-section" id="continue-watching-section" hidden>
+      <!-- Continue Watching -->
+      <section class="continue-watching-section" id="continue-watching-section" hidden aria-label="Continue watching">
         <div class="section-header">
           <h3>Continue Watching</h3>
-          <button class="clear-btn" onclick="PulseApp.clearContinueWatching()">Clear All</button>
+          <button class="clear-btn" onclick="PulseApp.clearContinueWatching()" aria-label="Clear continue watching list">Clear All</button>
         </div>
-        <div class="continue-watching-row" id="continue-watching-row"></div>
-      </div>
+        <div class="continue-watching-row" id="continue-watching-row" role="list"></div>
+      </section>
 
       <!-- Channel Grid -->
-      <div class="channels-section">
+      <section class="channels-section" aria-label="Channel browser">
         <div class="channels-header">
           <h2 id="section-title">All Channels</h2>
-          <span class="channels-count" id="channels-count"></span>
+          <span class="channels-count" id="channels-count" aria-live="polite"></span>
         </div>
-        <div class="channel-grid channel-grid--skeleton" id="skeleton-grid" hidden></div>
-        <div class="channel-grid" id="channel-grid"></div>
-        <div id="empty-message" hidden>
-          <div class="empty-state"><h3>No channels found</h3><p>Try adjusting your search</p></div>
+        <div class="channel-grid channel-grid--skeleton" id="skeleton-grid" hidden aria-hidden="true"></div>
+        <div class="channel-grid" id="channel-grid" role="list" aria-label="Channels"></div>
+        <div id="empty-message" hidden role="status">
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <h3>No channels found</h3>
+            <p>Try a different search or category</p>
+          </div>
         </div>
-      </div>
-      
+      </section>
+
       <!-- Pagination -->
-      <div class="pagination-bar" id="pagination-bar" hidden>
-        <div class="pagination-info" id="pagination-info"></div>
+      <nav class="pagination-bar" id="pagination-bar" hidden aria-label="Page navigation">
+        <div class="pagination-info" id="pagination-info" aria-live="polite"></div>
         <div class="pagination-controls">
-          <button onclick="PulseApp.goToPage(PulseApp.currentPage - 1)" id="prev-page-btn" disabled>Prev</button>
-          <div class="pagination-pages" id="pagination-pages"></div>
-          <button onclick="PulseApp.goToPage(PulseApp.currentPage + 1)" id="next-page-btn" disabled>Next</button>
+          <button onclick="PulseApp.goToPage(PulseApp.currentPage - 1)" id="prev-page-btn" disabled aria-label="Previous page">Prev</button>
+          <div class="pagination-pages" id="pagination-pages" role="group" aria-label="Page numbers"></div>
+          <button onclick="PulseApp.goToPage(PulseApp.currentPage + 1)" id="next-page-btn" disabled aria-label="Next page">Next</button>
         </div>
-      </div>
+      </nav>
     </main>
 
     <!-- Right Sidebar Overlay -->
-    <div class="sidebar-overlay" id="right-sidebar-overlay" onclick="PulseApp.closeSidebar('right')"></div>
+    <div class="sidebar-overlay" id="right-sidebar-overlay" onclick="PulseApp.closeSidebar('right')" aria-hidden="true"></div>
 
     <!-- Right Sidebar (Ads) -->
-    <aside class="sidebar sidebar-right sidebar-open" id="right-sidebar">
+    <aside class="sidebar sidebar-right sidebar-open" id="right-sidebar" aria-label="Sponsored content">
       <div class="sidebar-header">
-        <span>Sponsored</span>
-        <button class="icon-btn sidebar-close-btn" onclick="PulseApp.closeSidebar('right')">
-          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="sidebar-header-title">Sponsored</span>
+        <button class="icon-btn sidebar-close-btn" onclick="PulseApp.closeSidebar('right')" aria-label="Close sponsored panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
       </div>
       <div class="ad-panel" id="ad-panel">
         <div class="ad-card">
-          <a href="https://wa.me/8801755772612" target="_blank" rel="noopener">
-            <img src="/advertise/adv1.png" alt="Advertisement" loading="lazy" onerror="this.style.display='none';this.parentNode.innerHTML='<div class=ad-placeholder><span>Ad Space</span></div>';" />
+          <a href="https://wa.me/8801755772612" target="_blank" rel="noopener noreferrer" aria-label="Advertisement — contact on WhatsApp">
+            <img src="/advertise/adv1.png" alt="Advertisement" loading="lazy" width="248" height="200"
+              onerror="this.style.display='none';this.parentNode.innerHTML='<div class=\'ad-placeholder\'><span>Ad Space Available</span></div>';" />
           </a>
-          <span class="ad-label">Sponsored</span>
+          <span class="ad-label" aria-hidden="true">Sponsored</span>
         </div>
         <div class="ad-card">
-          <a href="https://wa.me/8801755772612" target="_blank" rel="noopener">
-            <img src="/advertise/adv2.png" alt="Advertisement" loading="lazy" onerror="this.style.display='none';this.parentNode.innerHTML='<div class=ad-placeholder><span>Ad Space</span></div>';" />
+          <a href="https://wa.me/8801755772612" target="_blank" rel="noopener noreferrer" aria-label="Advertisement — contact on WhatsApp">
+            <img src="/advertise/adv2.png" alt="Advertisement" loading="lazy" width="248" height="200"
+              onerror="this.style.display='none';this.parentNode.innerHTML='<div class=\'ad-placeholder\'><span>Ad Space Available</span></div>';" />
           </a>
-          <span class="ad-label">Sponsored</span>
+          <span class="ad-label" aria-hidden="true">Sponsored</span>
         </div>
         <div class="ad-card">
-          <a href="https://wa.me/8801755772612" target="_blank" rel="noopener">
-            <img src="/advertise/adv3.png" alt="Advertisement" loading="lazy" onerror="this.style.display='none';this.parentNode.innerHTML='<div class=ad-placeholder><span>Ad Space</span></div>';" />
+          <a href="https://wa.me/8801755772612" target="_blank" rel="noopener noreferrer" aria-label="Advertisement — contact on WhatsApp">
+            <img src="/advertise/adv3.png" alt="Advertisement" loading="lazy" width="248" height="200"
+              onerror="this.style.display='none';this.parentNode.innerHTML='<div class=\'ad-placeholder\'><span>Ad Space Available</span></div>';" />
           </a>
-          <span class="ad-label">Sponsored</span>
+          <span class="ad-label" aria-hidden="true">Sponsored</span>
         </div>
         <div class="ad-card">
-          <a href="https://wa.me/8801755772612" target="_blank" rel="noopener">
+          <a href="https://wa.me/8801755772612" target="_blank" rel="noopener noreferrer" class="ad-contact-link" aria-label="Advertise with us — contact +880 1755-772612 on WhatsApp">
             <div class="ad-contact">
+              <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <strong>+880 1755-772612</strong>
-              <small>Click to chat on WhatsApp</small>
+              <small>Advertise with us</small>
             </div>
           </a>
         </div>
@@ -374,156 +436,287 @@
   </div>
 
   <!-- Right Sidebar Toggle Button -->
-  <button class="right-sidebar-toggle-btn" id="right-sidebar-toggle-btn" onclick="PulseApp.toggleSidebar('right')" title="Toggle Ad Panel">
-    <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 10h4M7 14h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  <button class="right-sidebar-toggle-btn" id="right-sidebar-toggle-btn"
+    onclick="PulseApp.toggleSidebar('right')"
+    title="Toggle Ads Panel"
+    aria-label="Toggle sponsored panel"
+    aria-controls="right-sidebar">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 10h4M7 14h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
   </button>
 
   <!-- PWA Install Banner -->
-  <div id="pwa-install-banner" class="pwa-install-banner" hidden>
+  <div id="pwa-install-banner" class="pwa-install-banner" hidden role="complementary" aria-label="App install prompt">
     <div class="pwa-install-inner">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" fill="currentColor"/></svg>
       <span>Install Pulse.tv for quick access</span>
-      <button onclick="PulseApp.installPWA()">Install</button>
-      <button onclick="PulseApp.dismissPWA()" class="pwa-dismiss">&times;</button>
+      <button onclick="PulseApp.installPWA()" aria-label="Install app">Install</button>
+      <button onclick="PulseApp.dismissPWA()" class="pwa-dismiss" aria-label="Dismiss install prompt">&times;</button>
     </div>
   </div>
 
+  <!-- ═══ MODALS ═══ -->
+
   <!-- Share Modal -->
-  <div class="modal-overlay" id="share-modal" hidden>
+  <div class="modal-overlay" id="share-modal" hidden role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
     <div class="modal-box modal-box--sm">
-      <div class="modal-header"><h3>Share</h3><button onclick="PulseApp.closeShareMenu()" class="modal-close-btn">&times;</button></div>
-      <div class="modal-body share-buttons">
-        <button onclick="PulseApp.shareTo('whatsapp')">WhatsApp</button>
-        <button onclick="PulseApp.shareTo('facebook')">Facebook</button>
-        <button onclick="PulseApp.shareTo('telegram')">Telegram</button>
-        <button onclick="PulseApp.shareTo('twitter')">Twitter</button>
-        <button onclick="PulseApp.copyShareLink()">Copy Link</button>
+      <div class="modal-header">
+        <h3 id="share-modal-title">Share Channel</h3>
+        <button onclick="PulseApp.closeShareMenu()" class="modal-close-btn" aria-label="Close share dialog">&times;</button>
+      </div>
+      <div class="modal-body share-buttons" role="group" aria-label="Share options">
+        <button onclick="PulseApp.shareTo('whatsapp')">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          WhatsApp
+        </button>
+        <button onclick="PulseApp.shareTo('facebook')">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          Facebook
+        </button>
+        <button onclick="PulseApp.shareTo('telegram')">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Telegram
+        </button>
+        <button onclick="PulseApp.shareTo('twitter')">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          Twitter / X
+        </button>
+        <button onclick="PulseApp.copyShareLink()">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          Copy Link
+        </button>
       </div>
     </div>
   </div>
 
   <!-- Settings Modal -->
-  <div class="modal-overlay" id="settings-modal" hidden>
+  <div class="modal-overlay" id="settings-modal" hidden role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
     <div class="modal-box">
-      <div class="modal-header"><h3>Settings</h3><button onclick="PulseApp.closeSettings()" class="modal-close-btn">&times;</button></div>
+      <div class="modal-header">
+        <h3 id="settings-modal-title">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          Settings
+        </h3>
+        <button onclick="PulseApp.closeSettings()" class="modal-close-btn" aria-label="Close settings">&times;</button>
+      </div>
       <div class="modal-body">
-        <div class="form-group"><label>Data Saver Mode</label><select id="data-saver-select"><option value="auto">Auto</option><option value="high">High (1080p/4K)</option><option value="medium">Medium (480p)</option><option value="low">Low (360p)</option></select></div>
-        <div class="form-group"><label>Accent Color</label><div class="accent-colors" id="accent-colors"><button data-color="#6c5ce7" style="background:#6c5ce7"></button><button data-color="#e63950" style="background:#e63950"></button><button data-color="#3b82f6" style="background:#3b82f6"></button><button data-color="#22c55e" style="background:#22c55e"></button><button data-color="#f59e0b" style="background:#f59e0b"></button><button data-color="#ec4899" style="background:#ec4899"></button></div></div>
-        <div class="form-group"><label>Autoplay Next Channel</label><input type="checkbox" id="autoplay-toggle" checked /></div>
-        
-        <div class="nav-divider"></div>
-        <div class="nav-section-label">🔔 Notifications</div>
-        <div class="form-group"><label>Enable Notifications</label><input type="checkbox" id="notifications-toggle" /></div>
-        <div class="form-group"><label>Quiet Hours</label><input type="checkbox" id="quiet-hours-toggle" /></div>
-        <div class="form-group" style="flex-direction:row;gap:12px;">
-          <div style="flex:1;"><label style="font-size:11px;">From</label><input type="time" id="quiet-hours-start" value="22:00" /></div>
-          <div style="flex:1;"><label style="font-size:11px;">To</label><input type="time" id="quiet-hours-end" value="07:00" /></div>
-        </div>
-        <div class="form-group"><label>DND While Watching</label><input type="checkbox" id="dnd-watching-toggle" checked /></div>
-        <button onclick="PulseApp.sendTestNotification()" class="btn-primary" style="padding:8px 16px;font-size:12px;">Send Test Notification</button>
-        <div class="form-group"><label>Subscribed Channels</label><div id="subscriptions-list" style="max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;"></div></div>
-        
-        <div class="nav-divider"></div>
-        <div class="nav-section-label">🔒 Parental Controls</div>
-        <div class="form-group"><label>Set Parental PIN</label><input type="password" id="parental-pin" maxlength="4" placeholder="Enter 4-digit PIN" /><button onclick="PulseApp.setParentalPIN()" class="btn-primary" style="margin-top:4px;padding:6px 12px;font-size:12px;">Set PIN</button></div>
-        <div class="form-group"><label>Kids Mode</label><input type="checkbox" id="kids-mode-toggle" /></div>
-        
-        <div class="nav-divider"></div>
-        <button onclick="PulseApp.exportUserData()" class="btn-primary" style="padding:8px 16px;font-size:12px;">Export Backup</button>
+
+        <fieldset class="settings-fieldset">
+          <legend class="nav-section-label">⚙️ Playback</legend>
+          <div class="form-group">
+            <label for="data-saver-select">Data Saver Mode</label>
+            <select id="data-saver-select">
+              <option value="auto">Auto (Adaptive)</option>
+              <option value="high">High Quality (1080p+)</option>
+              <option value="medium">Medium (480p)</option>
+              <option value="low">Low (360p)</option>
+            </select>
+          </div>
+          <div class="form-group form-group--row">
+            <label for="autoplay-toggle">Autoplay next channel</label>
+            <input type="checkbox" id="autoplay-toggle" checked />
+          </div>
+        </fieldset>
+
+        <fieldset class="settings-fieldset">
+          <legend class="nav-section-label">🎨 Appearance</legend>
+          <div class="form-group">
+            <label>Accent Color</label>
+            <div class="accent-colors" id="accent-colors" role="group" aria-label="Choose accent color">
+              <button data-color="#6c5ce7" style="background:#6c5ce7" aria-label="Purple accent" title="Purple"></button>
+              <button data-color="#e63950" style="background:#e63950" aria-label="Red accent" title="Red"></button>
+              <button data-color="#3b82f6" style="background:#3b82f6" aria-label="Blue accent" title="Blue"></button>
+              <button data-color="#22c55e" style="background:#22c55e" aria-label="Green accent" title="Green"></button>
+              <button data-color="#f59e0b" style="background:#f59e0b" aria-label="Amber accent" title="Amber"></button>
+              <button data-color="#ec4899" style="background:#ec4899" aria-label="Pink accent" title="Pink"></button>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="settings-fieldset">
+          <legend class="nav-section-label">🔔 Notifications</legend>
+          <div class="form-group form-group--row">
+            <label for="notifications-toggle">Enable Notifications</label>
+            <input type="checkbox" id="notifications-toggle" />
+          </div>
+          <div class="form-group form-group--row">
+            <label for="quiet-hours-toggle">Quiet Hours</label>
+            <input type="checkbox" id="quiet-hours-toggle" />
+          </div>
+          <div class="form-group form-group--row form-group--time">
+            <div>
+              <label for="quiet-hours-start">From</label>
+              <input type="time" id="quiet-hours-start" value="22:00" aria-label="Quiet hours start time" />
+            </div>
+            <div>
+              <label for="quiet-hours-end">To</label>
+              <input type="time" id="quiet-hours-end" value="07:00" aria-label="Quiet hours end time" />
+            </div>
+          </div>
+          <div class="form-group form-group--row">
+            <label for="dnd-watching-toggle">DND while watching</label>
+            <input type="checkbox" id="dnd-watching-toggle" checked />
+          </div>
+          <button onclick="PulseApp.sendTestNotification()" class="btn-secondary" type="button">Send Test Notification</button>
+          <div class="form-group">
+            <label>Subscribed Channels</label>
+            <div id="subscriptions-list" class="subscriptions-list" role="list"></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="settings-fieldset">
+          <legend class="nav-section-label">🔒 Parental Controls</legend>
+          <div class="form-group">
+            <label for="parental-pin">Set Parental PIN</label>
+            <div class="pin-input-row">
+              <input type="password" id="parental-pin" maxlength="4" placeholder="4-digit PIN" autocomplete="new-password" inputmode="numeric" pattern="\d{4}" aria-label="Enter new 4-digit parental PIN" />
+              <button onclick="PulseApp.setParentalPIN()" class="btn-secondary" type="button">Set PIN</button>
+            </div>
+          </div>
+          <div class="form-group form-group--row">
+            <label for="kids-mode-toggle">Kids Mode</label>
+            <input type="checkbox" id="kids-mode-toggle" />
+          </div>
+        </fieldset>
+
+        <div class="nav-divider" role="separator"></div>
+        <button onclick="PulseApp.exportUserData()" class="btn-secondary" type="button" aria-label="Export all settings and data as backup">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          Export Backup
+        </button>
       </div>
     </div>
   </div>
 
   <!-- Sleep Timer Modal -->
-  <div class="modal-overlay" id="sleep-timer-modal" hidden>
-    <div class="modal-box"><div class="modal-header"><h3>Sleep Timer</h3><button onclick="PulseApp.closeSleepTimer()" class="modal-close-btn">&times;</button></div>
-    <div class="modal-body"><div class="sleep-options"><button onclick="PulseApp.setSleepTimer(15)">15 min</button><button onclick="PulseApp.setSleepTimer(30)">30 min</button><button onclick="PulseApp.setSleepTimer(60)">60 min</button><button onclick="PulseApp.setSleepTimer(120)">120 min</button><button onclick="PulseApp.setSleepTimer(0)">Cancel</button></div><div id="sleep-timer-status" class="sleep-status"></div></div></div>
-  </div>
-
-  <!-- M3U Modal -->
-  <div class="modal-overlay" id="m3u-modal" hidden>
-    <div class="modal-box"><div class="modal-header"><h3>Import M3U</h3><button onclick="PulseApp.closeM3UImport()" class="modal-close-btn">&times;</button></div>
-    <div class="modal-body"><input type="url" id="m3u-url" placeholder="https://example.com/playlist.m3u" class="m3u-input" /><p class="m3u-or">- or -</p><input type="file" id="m3u-file" accept=".m3u,.m3u8,.txt" /><button onclick="PulseApp.importM3U()" class="btn-primary">Import</button></div></div>
-  </div>
-
-  <!-- Shortcuts Modal -->
-  <div class="modal-overlay" id="shortcuts-modal" hidden>
-    <div class="modal-box modal-box--lg">
-      <div class="modal-header"><h3>Keyboard Shortcuts</h3><button onclick="PulseApp.closeShortcuts()" class="modal-close-btn">&times;</button></div>
+  <div class="modal-overlay" id="sleep-timer-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sleep-timer-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="sleep-timer-title">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Sleep Timer
+        </h3>
+        <button onclick="PulseApp.closeSleepTimer()" class="modal-close-btn" aria-label="Close sleep timer">&times;</button>
+      </div>
       <div class="modal-body">
-        <table class="shortcuts-table">
-          <tr><td colspan="2" style="color:var(--accent);font-weight:700;padding:8px 0;">Playback</td></tr>
-          <tr><td>Play / Pause</td><td><kbd>Space</kbd> or <kbd>K</kbd></td></tr>
-          <tr><td>Skip backward 10s</td><td><kbd>J</kbd></td></tr>
-          <tr><td>Skip forward 10s</td><td><kbd>L</kbd></td></tr>
-          <tr><td>Seek backward 5s</td><td><kbd>←</kbd></td></tr>
-          <tr><td>Seek forward 5s</td><td><kbd>→</kbd></td></tr>
-          <tr><td>Decrease speed</td><td><kbd>Shift</kbd> + <kbd>,</kbd></td></tr>
-          <tr><td>Increase speed</td><td><kbd>Shift</kbd> + <kbd>.</kbd></td></tr>
-          <tr><td colspan="2" style="color:var(--accent);font-weight:700;padding:8px 0;">Volume & Mute</td></tr>
-          <tr><td>Volume up</td><td><kbd>↑</kbd></td></tr>
-          <tr><td>Volume down</td><td><kbd>↓</kbd></td></tr>
-          <tr><td>Mute / Unmute</td><td><kbd>M</kbd></td></tr>
-          <tr><td colspan="2" style="color:var(--accent);font-weight:700;padding:8px 0;">Fullscreen & Viewing Modes</td></tr>
-          <tr><td>Fullscreen</td><td><kbd>F</kbd></td></tr>
-          <tr><td>Theater mode</td><td><kbd>T</kbd></td></tr>
-          <tr><td>Mini player (PiP)</td><td><kbd>I</kbd></td></tr>
-          <tr><td colspan="2" style="color:var(--accent);font-weight:700;padding:8px 0;">Navigation</td></tr>
-          <tr><td>Next channel</td><td><kbd>N</kbd></td></tr>
-          <tr><td>Previous channel</td><td><kbd>P</kbd></td></tr>
-          <tr><td colspan="2" style="color:var(--accent);font-weight:700;padding:8px 0;">Video Position</td></tr>
-          <tr><td>Start of video</td><td><kbd>Home</kbd> or <kbd>0</kbd></td></tr>
-          <tr><td>End of video</td><td><kbd>End</kbd></td></tr>
-          <tr><td>Jump to 10%-90%</td><td><kbd>1</kbd> – <kbd>9</kbd></td></tr>
-          <tr><td colspan="2" style="color:var(--accent);font-weight:700;padding:8px 0;">Frame Control (when paused)</td></tr>
-          <tr><td>Next frame</td><td><kbd>Shift</kbd> + <kbd>N</kbd></td></tr>
-          <tr><td>Previous frame</td><td><kbd>Shift</kbd> + <kbd>P</kbd></td></tr>
-          <tr><td colspan="2" style="color:var(--accent);font-weight:700;padding:8px 0;">Other</td></tr>
-          <tr><td>Focus search</td><td><kbd>/</kbd></td></tr>
-          <tr><td>Show shortcuts</td><td><kbd>?</kbd></td></tr>
-          <tr><td>Toggle sidebar</td><td><kbd>B</kbd></td></tr>
-          <tr><td>Audio Only Mode</td><td><kbd>A</kbd></td></tr>
+        <div class="sleep-options" role="group" aria-label="Sleep timer duration">
+          <button onclick="PulseApp.setSleepTimer(15)" aria-label="Set timer for 15 minutes">15 min</button>
+          <button onclick="PulseApp.setSleepTimer(30)" aria-label="Set timer for 30 minutes">30 min</button>
+          <button onclick="PulseApp.setSleepTimer(60)" aria-label="Set timer for 60 minutes">60 min</button>
+          <button onclick="PulseApp.setSleepTimer(120)" aria-label="Set timer for 120 minutes">120 min</button>
+          <button onclick="PulseApp.setSleepTimer(0)" aria-label="Cancel sleep timer" class="sleep-cancel">Cancel</button>
+        </div>
+        <div id="sleep-timer-status" class="sleep-status" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- M3U Import Modal -->
+  <div class="modal-overlay" id="m3u-modal" hidden role="dialog" aria-modal="true" aria-labelledby="m3u-modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="m3u-modal-title">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          Import M3U Playlist
+        </h3>
+        <button onclick="PulseApp.closeM3UImport()" class="modal-close-btn" aria-label="Close import dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="m3u-url">Playlist URL</label>
+          <input type="url" id="m3u-url" placeholder="https://example.com/playlist.m3u" class="m3u-input" autocomplete="off" aria-describedby="m3u-url-hint" />
+          <span id="m3u-url-hint" class="form-hint">Paste a direct link to an M3U or M3U8 file</span>
+        </div>
+        <div class="m3u-divider"><span>or upload a file</span></div>
+        <div class="form-group">
+          <label for="m3u-file">M3U File</label>
+          <input type="file" id="m3u-file" accept=".m3u,.m3u8,.txt" aria-label="Upload M3U playlist file" />
+        </div>
+        <button onclick="PulseApp.importM3U()" class="btn-primary" type="button">Import Playlist</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div class="modal-overlay" id="shortcuts-modal" hidden role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title">
+    <div class="modal-box modal-box--lg">
+      <div class="modal-header">
+        <h3 id="shortcuts-modal-title">Keyboard Shortcuts</h3>
+        <button onclick="PulseApp.closeShortcuts()" class="modal-close-btn" aria-label="Close shortcuts">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="shortcuts-table" role="table" aria-label="Keyboard shortcuts reference">
+          <tbody>
+            <tr><td colspan="2" class="shortcuts-section">Playback</td></tr>
+            <tr><td>Play / Pause</td><td><kbd>Space</kbd> or <kbd>K</kbd></td></tr>
+            <tr><td>Skip back 10s</td><td><kbd>J</kbd></td></tr>
+            <tr><td>Skip forward 10s</td><td><kbd>L</kbd></td></tr>
+            <tr><td>Seek back 5s</td><td><kbd>←</kbd></td></tr>
+            <tr><td>Seek forward 5s</td><td><kbd>→</kbd></td></tr>
+            <tr><td>Slower speed</td><td><kbd>Shift</kbd>+<kbd>,</kbd></td></tr>
+            <tr><td>Faster speed</td><td><kbd>Shift</kbd>+<kbd>.</kbd></td></tr>
+            <tr><td colspan="2" class="shortcuts-section">Volume</td></tr>
+            <tr><td>Volume up</td><td><kbd>↑</kbd></td></tr>
+            <tr><td>Volume down</td><td><kbd>↓</kbd></td></tr>
+            <tr><td>Mute / Unmute</td><td><kbd>M</kbd></td></tr>
+            <tr><td colspan="2" class="shortcuts-section">View</td></tr>
+            <tr><td>Fullscreen</td><td><kbd>F</kbd></td></tr>
+            <tr><td>Theater mode</td><td><kbd>T</kbd></td></tr>
+            <tr><td>Picture-in-Picture</td><td><kbd>I</kbd></td></tr>
+            <tr><td>Audio only</td><td><kbd>A</kbd></td></tr>
+            <tr><td colspan="2" class="shortcuts-section">Navigation</td></tr>
+            <tr><td>Next channel</td><td><kbd>N</kbd></td></tr>
+            <tr><td>Previous channel</td><td><kbd>P</kbd></td></tr>
+            <tr><td>Toggle sidebar</td><td><kbd>B</kbd></td></tr>
+            <tr><td>Focus search</td><td><kbd>/</kbd></td></tr>
+            <tr><td colspan="2" class="shortcuts-section">Position</td></tr>
+            <tr><td>Jump to start</td><td><kbd>0</kbd> or <kbd>Home</kbd></td></tr>
+            <tr><td>Jump to end</td><td><kbd>End</kbd></td></tr>
+            <tr><td>Jump to 10%–90%</td><td><kbd>1</kbd> – <kbd>9</kbd></td></tr>
+            <tr><td colspan="2" class="shortcuts-section">Other</td></tr>
+            <tr><td>Show shortcuts</td><td><kbd>?</kbd></td></tr>
+          </tbody>
         </table>
       </div>
     </div>
   </div>
 
   <!-- PIN Pad Modal -->
-  <div class="modal-overlay" id="pin-pad-modal" hidden>
+  <div class="modal-overlay" id="pin-pad-modal" hidden role="dialog" aria-modal="true" aria-labelledby="pin-pad-title">
     <div class="modal-box modal-box--sm">
       <div class="modal-header">
         <h3 id="pin-pad-title">Enter PIN</h3>
-        <button onclick="PulseApp.closePinPad()" class="modal-close-btn">&times;</button>
+        <button onclick="PulseApp.closePinPad()" class="modal-close-btn" aria-label="Cancel PIN entry">&times;</button>
       </div>
       <div class="modal-body">
         <div class="pin-pad-container">
-          <div class="pin-input-display" id="pin-input-display">
-            <span class="pin-dot-char">○</span>
-            <span class="pin-dot-char">○</span>
-            <span class="pin-dot-char">○</span>
-            <span class="pin-dot-char">○</span>
+          <div class="pin-input-display" id="pin-input-display" aria-label="PIN entry — 0 of 4 digits entered" aria-live="polite">
+            <span class="pin-dot-char" aria-hidden="true">○</span>
+            <span class="pin-dot-char" aria-hidden="true">○</span>
+            <span class="pin-dot-char" aria-hidden="true">○</span>
+            <span class="pin-dot-char" aria-hidden="true">○</span>
           </div>
-          <div class="pin-keypad">
-            <button class="pin-key">1</button>
-            <button class="pin-key">2</button>
-            <button class="pin-key">3</button>
-            <button class="pin-key">4</button>
-            <button class="pin-key">5</button>
-            <button class="pin-key">6</button>
-            <button class="pin-key">7</button>
-            <button class="pin-key">8</button>
-            <button class="pin-key">9</button>
-            <button class="pin-key pin-key--action pin-key--clear">Clear</button>
-            <button class="pin-key">0</button>
-            <button class="pin-key pin-key--action">⌫</button>
+          <div class="pin-keypad" role="group" aria-label="PIN keypad">
+            <button class="pin-key" aria-label="1">1</button>
+            <button class="pin-key" aria-label="2">2</button>
+            <button class="pin-key" aria-label="3">3</button>
+            <button class="pin-key" aria-label="4">4</button>
+            <button class="pin-key" aria-label="5">5</button>
+            <button class="pin-key" aria-label="6">6</button>
+            <button class="pin-key" aria-label="7">7</button>
+            <button class="pin-key" aria-label="8">8</button>
+            <button class="pin-key" aria-label="9">9</button>
+            <button class="pin-key pin-key--action pin-key--clear" aria-label="Clear all digits">Clear</button>
+            <button class="pin-key" aria-label="0">0</button>
+            <button class="pin-key pin-key--action" aria-label="Delete last digit">⌫</button>
           </div>
-          <button class="pin-key pin-key--submit" style="width:100%;height:48px;border-radius:var(--radius-sm);margin-top:4px;">Submit</button>
+          <button class="pin-key pin-key--submit" style="width:100%;height:48px;border-radius:var(--radius-sm);margin-top:4px;" aria-label="Submit PIN">Submit</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Toast Container -->
-  <div class="toast-container" id="toast-container"></div>
+  <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="false" role="region" aria-label="Notifications"></div>
 
   <script src="channels.js"></script>
   <script src="app.js"></script>
